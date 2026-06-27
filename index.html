@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Ahorros Perú</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-4 md:p-8 flex justify-center min-h-screen">
+
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8 w-full max-w-2xl">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Calculadora de Ahorro e Inversión</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tipo de Producto</label>
+                    <select id="tipoProducto" class="w-full px-4 py-2 border rounded-lg bg-white">
+                        <option value="ahorro">Cuenta de Ahorro (Flexible)</option>
+                        <option value="plazo">Depósito a Plazo Fijo</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Institución Financiera</label>
+                    <select id="entidad" class="w-full px-4 py-2 border rounded-lg bg-white"></select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Inversión Inicial (S/)</label>
+                    <input type="number" id="capital" value="1000" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+
+                <div id="divAporteMensual">
+                    <label class="block text-sm font-medium text-gray-700">Aporte Mensual (S/)</label>
+                    <input type="number" id="aporte" value="200" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Periodo (Años)</label>
+                    <input type="range" id="periodo" min="1" max="10" value="2" class="w-full">
+                    <span id="labelPeriodo" class="text-sm text-gray-500">2 años</span>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 flex flex-col justify-center">
+                <h2 class="text-indigo-900 font-semibold mb-4">Resultado Estimado</h2>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-sm text-indigo-600">Total Acumulado</p>
+                        <div id="resTotal" class="text-3xl font-bold text-indigo-900">S/ 0.00</div>
+                    </div>
+                    <div>
+                        <p class="text-sm text-indigo-600">Intereses Ganados</p>
+                        <div id="resInteres" class="text-xl font-semibold text-indigo-700">S/ 0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tasas = {
+            ahorro: [
+                { nombre: "Banco Tradicional", trea: 0.015 },
+                { nombre: "Efectibank / Cajas", trea: 0.045 }
+            ],
+            plazo: [
+                { nombre: "Banco Tradicional", trea: 0.040 },
+                { nombre: "Efectibank / Cajas", trea: 0.065 }
+            ]
+        };
+
+        const selTipo = document.getElementById('tipoProducto');
+        const selEntidad = document.getElementById('entidad');
+        const inputCapital = document.getElementById('capital');
+        const inputAporte = document.getElementById('aporte');
+        const inputPeriodo = document.getElementById('periodo');
+        const labelPeriodo = document.getElementById('labelPeriodo');
+        const divAporte = document.getElementById('divAporteMensual');
+
+        function actualizarEntidades() {
+            const tipo = selTipo.value;
+            selEntidad.innerHTML = '';
+            tasas[tipo].forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.trea;
+                opt.textContent = `${item.nombre} (${(item.trea*100).toFixed(1)}% TREA)`;
+                selEntidad.appendChild(opt);
+            });
+            divAporte.classList.toggle('hidden', tipo === 'plazo');
+            calcular();
+        }
+
+        function calcular() {
+            const P = parseFloat(inputCapital.value) || 0;
+            const M = selTipo.value === 'plazo' ? 0 : (parseFloat(inputAporte.value) || 0);
+            const r = parseFloat(selEntidad.value);
+            const t = parseFloat(inputPeriodo.value);
+            
+            let total = P;
+            for(let i = 0; i < t * 12; i++) {
+                total = (total * (1 + (r / 12))) + M;
+            }
+
+            const totalInvertido = P + (M * t * 12);
+            document.getElementById('resTotal').textContent = 'S/ ' + total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('resInteres').textContent = 'S/ ' + (total - totalInvertido).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        [selTipo, selEntidad, inputCapital, inputAporte, inputPeriodo].forEach(el => el.addEventListener('input', () => {
+            if(el === inputPeriodo) labelPeriodo.textContent = el.value + ' años';
+            calcular();
+        }));
+        
+        selTipo.addEventListener('change', actualizarEntidades);
+        actualizarEntidades();
+    </script>
+</body>
+</html>
