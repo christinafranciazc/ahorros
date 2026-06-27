@@ -8,51 +8,77 @@
 </head>
 <body class="bg-gray-50 p-4 md:p-8 flex justify-center min-h-screen">
 
-    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8 w-full max-w-2xl">
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8 w-full max-w-4xl">
         <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Calculadora de Ahorro e Inversión</h1>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Columna de Controles -->
             <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Tipo de Producto</label>
-                    <select id="tipoProducto" class="w-full px-4 py-2 border rounded-lg bg-white">
-                        <option value="ahorro">Cuenta de Ahorro (Flexible)</option>
-                        <option value="plazo">Depósito a Plazo Fijo</option>
-                    </select>
+                <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Configuración</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Producto</label>
+                        <select id="tipoProducto" class="w-full px-4 py-2 border rounded-lg bg-white">
+                            <option value="ahorro">Cuenta de Ahorro</option>
+                            <option value="plazo">Plazo Fijo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Institución</label>
+                        <select id="entidad" class="w-full px-4 py-2 border rounded-lg bg-white"></select>
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Institución Financiera</label>
-                    <select id="entidad" class="w-full px-4 py-2 border rounded-lg bg-white"></select>
+                    <label class="block text-sm font-medium text-gray-700">TREA (%) Manual</label>
+                    <input type="number" id="treaManual" step="0.01" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Inversión (S/)</label>
+                        <input type="number" id="capital" value="1000" class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                    <div id="divAporteMensual">
+                        <label class="block text-sm font-medium text-gray-700">Aporte Mensual (S/)</label>
+                        <input type="number" id="aporte" value="200" class="w-full px-4 py-2 border rounded-lg">
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Inversión Inicial (S/)</label>
-                    <input type="number" id="capital" value="1000" class="w-full px-4 py-2 border rounded-lg">
-                </div>
-
-                <div id="divAporteMensual">
-                    <label class="block text-sm font-medium text-gray-700">Aporte Mensual (S/)</label>
-                    <input type="number" id="aporte" value="200" class="w-full px-4 py-2 border rounded-lg">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Periodo (Años)</label>
+                    <label class="block text-sm font-medium text-gray-700">Periodo (Años): <span id="labelPeriodo">2 años</span></label>
                     <input type="range" id="periodo" min="1" max="10" value="2" class="w-full">
-                    <span id="labelPeriodo" class="text-sm text-gray-500">2 años</span>
+                </div>
+
+                <!-- Sección de Aportes Extraordinarios -->
+                <div class="pt-6 border-t">
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Aportes Extraordinarios</h2>
+                    <div class="flex gap-2">
+                        <input type="number" id="extraMonto" placeholder="Monto S/" class="w-1/2 px-3 py-2 border rounded-lg text-sm">
+                        <input type="number" id="extraMes" placeholder="Mes (1-120)" class="w-1/3 px-3 py-2 border rounded-lg text-sm">
+                        <button onclick="agregarExtra()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">+</button>
+                    </div>
+                    <div id="listaExtras" class="mt-3 space-y-2 max-h-32 overflow-y-auto"></div>
                 </div>
             </div>
 
-            <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 flex flex-col justify-center">
+            <!-- Columna de Resultados -->
+            <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 flex flex-col justify-center">
                 <h2 class="text-indigo-900 font-semibold mb-4">Resultado Estimado</h2>
-                <div class="space-y-4">
+                <div class="space-y-6">
                     <div>
                         <p class="text-sm text-indigo-600">Total Acumulado</p>
-                        <div id="resTotal" class="text-3xl font-bold text-indigo-900">S/ 0.00</div>
+                        <div id="resTotal" class="text-4xl font-bold text-indigo-900">S/ 0.00</div>
                     </div>
-                    <div>
-                        <p class="text-sm text-indigo-600">Intereses Ganados</p>
-                        <div id="resInteres" class="text-xl font-semibold text-indigo-700">S/ 0.00</div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs text-indigo-500">Inversión Total</p>
+                            <div id="resInvertido" class="text-lg font-semibold text-indigo-800">S/ 0.00</div>
+                        </div>
+                        <div>
+                            <p class="text-xs text-indigo-500">Intereses Ganados</p>
+                            <div id="resInteres" class="text-lg font-semibold text-indigo-800">S/ 0.00</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -63,16 +89,21 @@
         const tasas = {
             ahorro: [
                 { nombre: "Banco Tradicional", trea: 0.015 },
-                { nombre: "Efectibank / Cajas", trea: 0.045 }
+                { nombre: "Efectibank", trea: 0.045 },
+                { nombre: "Cajas/Financieras", trea: 0.050 }
             ],
             plazo: [
                 { nombre: "Banco Tradicional", trea: 0.040 },
-                { nombre: "Efectibank / Cajas", trea: 0.065 }
+                { nombre: "Efectibank", trea: 0.065 },
+                { nombre: "Cajas/Financieras", trea: 0.070 }
             ]
         };
 
+        let listaExtras = [];
+
         const selTipo = document.getElementById('tipoProducto');
         const selEntidad = document.getElementById('entidad');
+        const inputTrea = document.getElementById('treaManual');
         const inputCapital = document.getElementById('capital');
         const inputAporte = document.getElementById('aporte');
         const inputPeriodo = document.getElementById('periodo');
@@ -81,7 +112,7 @@
 
         function actualizarEntidades() {
             const tipo = selTipo.value;
-            selEntidad.innerHTML = '';
+            selEntidad.innerHTML = '<option value="">Seleccionar entidad...</option>';
             tasas[tipo].forEach(item => {
                 const opt = document.createElement('option');
                 opt.value = item.trea;
@@ -89,32 +120,77 @@
                 selEntidad.appendChild(opt);
             });
             divAporte.classList.toggle('hidden', tipo === 'plazo');
+        }
+
+        selEntidad.addEventListener('change', () => {
+            if(selEntidad.value) inputTrea.value = (parseFloat(selEntidad.value) * 100).toFixed(2);
+            calcular();
+        });
+
+        function agregarExtra() {
+            const monto = parseFloat(document.getElementById('extraMonto').value);
+            const mes = parseInt(document.getElementById('extraMes').value);
+            if(monto && mes) {
+                listaExtras.push({monto, mes});
+                renderExtras();
+                calcular();
+            }
+        }
+
+        function renderExtras() {
+            const container = document.getElementById('listaExtras');
+            container.innerHTML = '';
+            listaExtras.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between bg-white p-2 rounded text-xs border";
+                div.innerHTML = `<span>Mes ${item.mes}: S/ ${item.monto}</span> 
+                                 <button onclick="quitarExtra(${index})" class="text-red-500">x</button>`;
+                container.appendChild(div);
+            });
+        }
+
+        function quitarExtra(index) {
+            listaExtras.splice(index, 1);
+            renderExtras();
             calcular();
         }
 
         function calcular() {
             const P = parseFloat(inputCapital.value) || 0;
             const M = selTipo.value === 'plazo' ? 0 : (parseFloat(inputAporte.value) || 0);
-            const r = parseFloat(selEntidad.value);
-            const t = parseFloat(inputPeriodo.value);
+            const r = parseFloat(inputTrea.value) / 100 || 0;
+            const t = parseInt(inputPeriodo.value);
+            const totalMeses = t * 12;
             
             let total = P;
-            for(let i = 0; i < t * 12; i++) {
+            let capitalInvertido = P;
+
+            for(let i = 1; i <= totalMeses; i++) {
                 total = (total * (1 + (r / 12))) + M;
+                capitalInvertido += M;
+                
+                // Sumar aportes extraordinarios
+                listaExtras.forEach(ext => {
+                    if(ext.mes === i) {
+                        total += ext.monto;
+                        capitalInvertido += ext.monto;
+                    }
+                });
             }
 
-            const totalInvertido = P + (M * t * 12);
             document.getElementById('resTotal').textContent = 'S/ ' + total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('resInteres').textContent = 'S/ ' + (total - totalInvertido).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('resInteres').textContent = 'S/ ' + (total - capitalInvertido).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('resInvertido').textContent = 'S/ ' + capitalInvertido.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
 
-        [selTipo, selEntidad, inputCapital, inputAporte, inputPeriodo].forEach(el => el.addEventListener('input', () => {
+        [selTipo, inputTrea, inputCapital, inputAporte, inputPeriodo].forEach(el => el.addEventListener('input', () => {
             if(el === inputPeriodo) labelPeriodo.textContent = el.value + ' años';
             calcular();
         }));
         
         selTipo.addEventListener('change', actualizarEntidades);
         actualizarEntidades();
+        actualizarEntidades(); // Inicial
     </script>
 </body>
 </html>
